@@ -27,13 +27,13 @@ func buildImageCmd(cmd *cobra.Command, args []string) (err error) {
 		Remove:         true,
 		ForceRemove:    true,
 		PullParent:     true,
-		Tags:           []string{IMAGE_NAME},
+		Tags:           []string{config.RemoteImageName},
 		Dockerfile:     "docker/docker-build.Dockerfile",
 	}
 
 	// build the image
 	ctx := context.Background()
-	buildResponse, err := client.ImageBuild(ctx, buildContext, buildOptions)
+	buildResponse, err := dockerClient.ImageBuild(ctx, buildContext, buildOptions)
 	if err != nil {
 		return
 	}
@@ -51,7 +51,7 @@ func buildImageCmd(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	// push the image to docker hub
-	pushResponse, err := client.ImagePush(context.Background(), "docker.io/"+IMAGE_NAME, types.ImagePushOptions{
+	pushResponse, err := dockerClient.ImagePush(context.Background(), "docker.io/"+config.RemoteImageName, types.ImagePushOptions{
 		RegistryAuth: auth64,
 	})
 	if err != nil {

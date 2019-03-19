@@ -35,7 +35,7 @@ func stopImageCmd(cmd *cobra.Command, args []string) (err error) {
 
 func chooseContainer() (container types.Container, err error) {
 	ctx := context.Background()
-	containers, err := client.ContainerList(ctx, types.ContainerListOptions{
+	containers, err := dockerClient.ContainerList(ctx, types.ContainerListOptions{
 		All: true,
 	})
 

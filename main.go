@@ -3,35 +3,39 @@ package main
 import (
 	"fmt"
 
+	"github.com/Tomiyou/jsonLoader"
 	docker "github.com/docker/docker/client"
 	"github.com/spf13/cobra"
 )
-
-const IMAGE_NAME string = "tomiyou/crypto-arbitrage:latest"
 
 var rootCmd = &cobra.Command{
 	Use:   "crypto-arbitrage",
 	Short: "Crypto-arbitrage bot written in go.",
 }
 
-var client *docker.Client
+var dockerClient *docker.Client
+
+var config struct {
+	RemoteImageName      string `json:"remoteImageName"`
+	TemporaryTarPath     string `json:"temporaryTarPath"`
+	EncryptedSecretsPath string `json:"encryptedSecretsPath"`
+	CryptobotSrcPath     string `json:"cryptobotSrcPath"`
+}
 
 func init() {
 	var err error
 
+	// load config
+	err = jsonLoader.LoadJSON("config.json", &config)
+	if err != nil {
+		panic(err)
+	}
+
 	// init cobra commands
-	rootCmd.AddCommand(buildCmd)
-	rootCmd.AddCommand(startCmd)
-	rootCmd.AddCommand(testCmd)
-	rootCmd.AddCommand(stopCmd)
-	rootCmd.AddCommand(logCmd)
-	rootCmd.AddCommand(updateCmd)
-	rootCmd.AddCommand(encryptCmd)
-	rootCmd.AddCommand(decryptCmd)
-	rootCmd.AddCommand(cleanCmd)
+	rootCmd.AddCommand(buildCmd, startCmd, stopCmd, logCmd, updateCmd, encryptCmd, decryptCmd, cleanCmd)
 
 	// init docker api
-	client, err = docker.NewEnvClient()
+	dockerClient, err = docker.NewEnvClient()
 	if err != nil {
 		panic(err)
 	}

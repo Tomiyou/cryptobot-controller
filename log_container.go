@@ -26,7 +26,7 @@ func logContainerCmd(cmd *cobra.Command, args []string) (err error) {
 	////////////////////// the container was chosen, show the logs //////////////////////////////////////////////
 	ctx := context.Background()
 	// get the log stream
-	stream, err := client.ContainerLogs(ctx, container.ID, types.ContainerLogsOptions{
+	stream, err := dockerClient.ContainerLogs(ctx, container.ID, types.ContainerLogsOptions{
 		// Follow:     true,
 		ShowStdout: true,
 		ShowStderr: true,

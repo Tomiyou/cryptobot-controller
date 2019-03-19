@@ -18,7 +18,7 @@ var cleanCmd = &cobra.Command{
 func cleanDockerCmd(cmd *cobra.Command, args []string) (err error) {
 	////////////////////// make the user choose the config that is used as base /////////////////////////////////
 	ctx := context.Background()
-	containers, err := client.ContainerList(ctx, types.ContainerListOptions{
+	containers, err := dockerClient.ContainerList(ctx, types.ContainerListOptions{
 		All: true,
 	})
 
@@ -32,7 +32,7 @@ func cleanDockerCmd(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	////////////////////// the container was chosen, time to stop ///////////////////////////////////////////////
-	images, err := client.ImageList(ctx, types.ImageListOptions{})
+	images, err := dockerClient.ImageList(ctx, types.ImageListOptions{})
 	if err != nil {
 		return
 	}
@@ -40,7 +40,7 @@ func cleanDockerCmd(cmd *cobra.Command, args []string) (err error) {
 	for _, image := range images {
 		for _, tag := range image.RepoTags {
 			if strings.HasPrefix(tag, "cryptobot_") {
-				_, err = client.ImageRemove(ctx, image.ID, types.ImageRemoveOptions{})
+				_, err = dockerClient.ImageRemove(ctx, image.ID, types.ImageRemoveOptions{})
 				if err == nil {
 					fmt.Println("Removed image with tag:", tag)
 				}

@@ -22,7 +22,7 @@ func updateImageCmd(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	// pull the image from the docker hub
-	reader, err := client.ImagePull(context.Background(), "docker.io/"+IMAGE_NAME, types.ImagePullOptions{
+	reader, err := dockerClient.ImagePull(context.Background(), "docker.io/"+config.RemoteImageName, types.ImagePullOptions{
 		RegistryAuth: auth64,
 	})
 	if err != nil {

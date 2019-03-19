@@ -73,7 +73,7 @@ func startImageCmd(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	// build the image
-	buildResponse, err := client.ImageBuild(ctx, buildContext, buildOptions)
+	buildResponse, err := dockerClient.ImageBuild(ctx, buildContext, buildOptions)
 	if err != nil {
 		return
 	}
@@ -88,7 +88,7 @@ func startImageCmd(cmd *cobra.Command, args []string) (err error) {
 	options.Add("ancestor", imageName)
 
 	// first we get the running containers
-	containers, err := client.ContainerList(ctx, types.ContainerListOptions{
+	containers, err := dockerClient.ContainerList(ctx, types.ContainerListOptions{
 		All:     true,
 		Filters: options,
 	})
@@ -108,7 +108,7 @@ func startImageCmd(cmd *cobra.Command, args []string) (err error) {
 
 	////////////////////// now run the created image ////////////////////////////////////////////////////////////
 	// create the container
-	createContResp, err := client.ContainerCreate(ctx, &container.Config{
+	createContResp, err := dockerClient.ContainerCreate(ctx, &container.Config{
 		Image: imageName,
 		// Tty:    true,
 		Labels: map[string]string{"config_name": config},
@@ -124,7 +124,7 @@ func startImageCmd(cmd *cobra.Command, args []string) (err error) {
 	fmt.Println("Created container with ID:", createContResp.ID)
 
 	// run the created container
-	if err = client.ContainerStart(ctx, createContResp.ID, types.ContainerStartOptions{}); err != nil {
+	if err = dockerClient.ContainerStart(ctx, createContResp.ID, types.ContainerStartOptions{}); err != nil {
 		return
 	}
 
