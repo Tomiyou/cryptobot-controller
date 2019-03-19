@@ -15,7 +15,7 @@ var buildCmd = &cobra.Command{
 
 func buildImageCmd(cmd *cobra.Command, args []string) (err error) {
 	////////////////////// create tar file for docker image build ///////////////////////////////////////////////
-	buildContext, err := createTarFile(".")
+	buildContext, err := createTarFile(botConfig.CryptobotSrcPath, "")
 	defer buildContext.Close()
 	if err != nil {
 		return
@@ -27,8 +27,8 @@ func buildImageCmd(cmd *cobra.Command, args []string) (err error) {
 		Remove:         true,
 		ForceRemove:    true,
 		PullParent:     true,
-		Tags:           []string{config.RemoteImageName},
-		Dockerfile:     "docker/docker-build.Dockerfile",
+		Tags:           []string{botConfig.RemoteImageName},
+		Dockerfile:     "dockerfiles/docker-build.Dockerfile",
 	}
 
 	// build the image
@@ -51,7 +51,7 @@ func buildImageCmd(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	// push the image to docker hub
-	pushResponse, err := dockerClient.ImagePush(context.Background(), "docker.io/"+config.RemoteImageName, types.ImagePushOptions{
+	pushResponse, err := dockerClient.ImagePush(context.Background(), "docker.io/"+botConfig.RemoteImageName, types.ImagePushOptions{
 		RegistryAuth: auth64,
 	})
 	if err != nil {

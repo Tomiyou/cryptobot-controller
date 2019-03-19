@@ -9,7 +9,7 @@ exchangeB:
   keyFile: "keys/hitbtc.key"
   tickerA: "BTC" # currency
   tickerB: "DTR" # asset
-  fee: "0.0018"
+  fee: "0.0021"
 mock: true # če je true, pomeni da bot bot ne izvede dejanskih tradov
 secondsToSleep: 30 # sekunde, ki jih bot prespi, potem ko se zaključi en bot tick
 secondsToSleepAfterTrade: 70 # sekunde, ki jih bot prespi po tick-u, ko naredi trade

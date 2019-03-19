@@ -55,7 +55,7 @@ func startImageCmd(cmd *cobra.Command, args []string) (err error) {
 	ctx := context.Background()
 
 	// create tar file for docker image build
-	buildContext, err := createTarFile("keys", "config", "docker")
+	buildContext, err := createTarFile("", "keys", "config", "dockerfiles")
 	defer buildContext.Close()
 	if err != nil {
 		return
@@ -68,7 +68,7 @@ func startImageCmd(cmd *cobra.Command, args []string) (err error) {
 		// ForceRemove:    true,
 		// PullParent:     true,
 		Tags:       []string{imageName},
-		Dockerfile: "docker/docker-run.Dockerfile",
+		Dockerfile: "dockerfiles/docker-run.Dockerfile",
 		BuildArgs:  map[string]*string{"configPath": &configPath},
 	}
 
@@ -85,7 +85,7 @@ func startImageCmd(cmd *cobra.Command, args []string) (err error) {
 
 	////////////////////// stop and remove any previous container that uses this imageName //////////////////////
 	options := filters.NewArgs()
-	options.Add("ancestor", imageName)
+	options.Add("label", "config_name="+config)
 
 	// first we get the running containers
 	containers, err := dockerClient.ContainerList(ctx, types.ContainerListOptions{
@@ -111,7 +111,9 @@ func startImageCmd(cmd *cobra.Command, args []string) (err error) {
 	createContResp, err := dockerClient.ContainerCreate(ctx, &container.Config{
 		Image: imageName,
 		// Tty:    true,
-		Labels: map[string]string{"config_name": config},
+		Labels: map[string]string{
+			"config_name": config,
+		},
 	}, &container.HostConfig{
 		RestartPolicy: container.RestartPolicy{
 			Name: "on-failure",

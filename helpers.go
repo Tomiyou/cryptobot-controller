@@ -70,19 +70,35 @@ func outputStream(body io.ReadCloser) (err error) {
 
 // !!! IMPORTANT
 // We don't close the file, because we depend on the user to do so
-func createTarFile(inputs ...string) (file *os.File, err error) {
-	// first create the archive
+func createTarFile(prefix string, inputs ...string) (file *os.File, err error) {
+	// check the prefix
+	if prefix != "" {
+		fmt.Println(prefix)
+
+		// if the last character in't a slash, add it
+		if prefix[len(prefix)-1] != '/' {
+			prefix += "/"
+		}
+
+		fmt.Println(prefix)
+
+		for i, input := range inputs {
+			inputs[i] = prefix + input
+		}
+		fmt.Println(inputs)
+	}
+	// create the archive
 	tar := archiver.Tar{
 		MkdirAll:          true,
 		OverwriteExisting: true,
 	}
-	err = tar.Archive(inputs, config.TemporaryTarPath)
+	err = tar.Archive(inputs, botConfig.TemporaryTarPath)
 	if err != nil {
 		return
 	}
 
 	// now open the tar file using the reader interface (archivex.TarFile has writer interface)
-	if file, err = os.Open(config.TemporaryTarPath); err != nil {
+	if file, err = os.Open(botConfig.TemporaryTarPath); err != nil {
 		return
 	}
 
@@ -94,7 +110,7 @@ func extractTarFile(destination string) (err error) {
 		MkdirAll:          true,
 		OverwriteExisting: true,
 	}
-	err = tar.Unarchive(config.TemporaryTarPath, destination)
+	err = tar.Unarchive(botConfig.TemporaryTarPath, destination)
 	return
 }
 

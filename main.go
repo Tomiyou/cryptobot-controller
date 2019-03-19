@@ -15,7 +15,7 @@ var rootCmd = &cobra.Command{
 
 var dockerClient *docker.Client
 
-var config struct {
+var botConfig struct {
 	RemoteImageName      string `json:"remoteImageName"`
 	TemporaryTarPath     string `json:"temporaryTarPath"`
 	EncryptedSecretsPath string `json:"encryptedSecretsPath"`
@@ -26,7 +26,7 @@ func init() {
 	var err error
 
 	// load config
-	err = jsonLoader.LoadJSON("config.json", &config)
+	err = jsonLoader.LoadJSON("config.json", &botConfig)
 	if err != nil {
 		panic(err)
 	}

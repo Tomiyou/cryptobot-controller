@@ -50,7 +50,7 @@ func encryptSecretsCmd(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	// create target file
-	target, err := os.Create(config.EncryptedSecretsPath)
+	target, err := os.Create(botConfig.EncryptedSecretsPath)
 	if err != nil {
 		return
 	}
@@ -70,7 +70,7 @@ func decryptSecretsCmd(cmd *cobra.Command, args []string) (err error) {
 	key := args[0]
 
 	// read the encrypted file
-	data, err := ioutil.ReadFile(config.EncryptedSecretsPath)
+	data, err := ioutil.ReadFile(botConfig.EncryptedSecretsPath)
 	if err != nil {
 		return
 	}
@@ -82,7 +82,7 @@ func decryptSecretsCmd(cmd *cobra.Command, args []string) (err error) {
 	}
 
 	// now write it to temporary tar file
-	tmp, err := os.Create(config.TemporaryTarPath)
+	tmp, err := os.Create(botConfig.TemporaryTarPath)
 	if err != nil {
 		return
 	}
