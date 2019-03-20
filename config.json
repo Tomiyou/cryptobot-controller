@@ -1,6 +1,0 @@
-{
-  "remoteImageName": "tomiyou/crypto-arbitrage:latest",
-  "temporaryTarPath": "/tmp/cryptobot_temporary.tar",
-  "encryptedSecretsPath": "keys.encrypted",
-  "cryptobotSrcPath": "/home/tomi/dev/crypto-arbitrage"
-}
