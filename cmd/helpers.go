@@ -73,19 +73,14 @@ func outputStream(body io.ReadCloser) (err error) {
 func createTarFile(prefix string, inputs ...string) (file *os.File, err error) {
 	// check the prefix
 	if prefix != "" {
-		fmt.Println(prefix)
-
 		// if the last character in't a slash, add it
 		if prefix[len(prefix)-1] != '/' {
 			prefix += "/"
 		}
 
-		fmt.Println(prefix)
-
 		for i, input := range inputs {
 			inputs[i] = prefix + input
 		}
-		fmt.Println(inputs)
 	}
 	// create the archive
 	tar := archiver.Tar{

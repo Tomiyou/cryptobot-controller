@@ -12,25 +12,23 @@ import (
 var StopCmd = &cobra.Command{
 	Use:   "stop",
 	Short: "Stop crypto-arbitrage bot.",
-	RunE:  stopImageCmd,
-}
+	RunE: func(cmd *cobra.Command, args []string) (err error) {
+		////////////////////// make the user choose the config that is used as base /////////////////////////////////
+		container, err := chooseContainer()
+		if err != nil {
+			return
+		}
 
-func stopImageCmd(cmd *cobra.Command, args []string) (err error) {
-	////////////////////// make the user choose the config that is used as base /////////////////////////////////
-	container, err := chooseContainer()
-	if err != nil {
+		////////////////////// the container was chosen, time to stop ///////////////////////////////////////////////
+		err = stopAndRemoveContainer(container.ID)
+		if err != nil {
+			return
+		}
+
+		fmt.Println("Stopped and removed container with id:", container.ID)
+
 		return
-	}
-
-	////////////////////// the container was chosen, time to stop ///////////////////////////////////////////////
-	err = stopAndRemoveContainer(container.ID)
-	if err != nil {
-		return
-	}
-
-	fmt.Println("Stopped and removed container with id:", container.ID)
-
-	return
+	},
 }
 
 func chooseContainer() (container types.Container, err error) {
