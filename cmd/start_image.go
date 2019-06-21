@@ -4,11 +4,14 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/api/types/mount"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 )
@@ -104,6 +107,13 @@ var StartCmd = &cobra.Command{
 		}
 
 		////////////////////// now run the created image ////////////////////////////////////////////////////////////
+		// get the cwd used for mounting csv folder
+		ex, err := os.Executable()
+		if err != nil {
+			panic(err)
+		}
+		csv_folder := filepath.Dir(ex) + "/csv"
+
 		// create the container
 		createContResp, err := dockerClient.ContainerCreate(ctx, &container.Config{
 			Image: imageName,
@@ -114,6 +124,13 @@ var StartCmd = &cobra.Command{
 		}, &container.HostConfig{
 			RestartPolicy: container.RestartPolicy{
 				Name: "on-failure",
+			},
+			Mounts: []mount.Mount{
+				{
+					Type:   mount.TypeBind,
+					Source: csv_folder,
+					Target: "/mounted",
+				},
 			},
 		}, nil, "")
 		if err != nil {
