@@ -22,7 +22,6 @@ func init() {
 		cmd.BuildCmd,
 		cmd.StartCmd,
 		cmd.StopCmd,
-		cmd.LogCmd,
 		cmd.UpdateCmd,
 		cmd.EncryptCmd,
 		cmd.DecryptCmd,

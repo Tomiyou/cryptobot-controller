@@ -12,7 +12,7 @@ var botConfig struct {
 	RemoteImageName      string `json:"remoteImageName"`
 	TemporaryTarPath     string `json:"temporaryTarPath"`
 	EncryptedSecretsPath string `json:"encryptedSecretsPath"`
-	CryptobotSrcPath     string `json:"cryptobotSrcPath"`
+	ArbitrageSrcPath     string `json:"ArbitrageSrcPath"`
 }
 
 func Initialize() (err error) {

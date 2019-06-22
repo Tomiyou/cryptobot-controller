@@ -68,20 +68,8 @@ func outputStream(body io.ReadCloser) (err error) {
 	return
 }
 
-// !!! IMPORTANT
-// We don't close the file, because we depend on the user to do so
-func createTarFile(prefix string, inputs ...string) (file *os.File, err error) {
-	// check the prefix
-	if prefix != "" {
-		// if the last character in't a slash, add it
-		if prefix[len(prefix)-1] != '/' {
-			prefix += "/"
-		}
-
-		for i, input := range inputs {
-			inputs[i] = prefix + input
-		}
-	}
+// IMPORTANT: .close() method needs to be called manually; also '/' at the end of the name is for folders
+func createTarFile(inputs ...string) (file *os.File, err error) {
 	// create the archive
 	tar := archiver.Tar{
 		MkdirAll:          true,
@@ -92,12 +80,8 @@ func createTarFile(prefix string, inputs ...string) (file *os.File, err error) {
 		return
 	}
 
-	// now open the tar file using the reader interface (archivex.TarFile has writer interface)
-	if file, err = os.Open(botConfig.TemporaryTarPath); err != nil {
-		return
-	}
-
-	return
+	// open the created tar file and return the interface
+	return os.Open(botConfig.TemporaryTarPath)
 }
 
 func extractTarFile(destination string) (err error) {

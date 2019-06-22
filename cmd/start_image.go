@@ -55,7 +55,7 @@ var StartCmd = &cobra.Command{
 		ctx := context.Background()
 
 		// create tar file for docker image build
-		buildContext, err := createTarFile("", "keys", "config", "docker/docker-run.Dockerfile")
+		buildContext, err := createTarFile(botConfig.ArbitrageSrcPath+"/docker/docker-run.Dockerfile", "keys", "config")
 		defer buildContext.Close()
 		if err != nil {
 			return
