@@ -22,6 +22,11 @@ func Initialize() (err error) {
 		panic(err)
 	}
 
+	// add / to arbitrage src folder
+	if botConfig.ArbitrageSrcPath[len(botConfig.ArbitrageSrcPath)-1] != '/' {
+		botConfig.ArbitrageSrcPath += "/"
+	}
+
 	// init docker api
 	dockerClient, err = docker.NewEnvClient()
 	if err != nil {

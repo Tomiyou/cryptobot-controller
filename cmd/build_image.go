@@ -12,7 +12,7 @@ var BuildCmd = &cobra.Command{
 	Short: "Build a crypto-arbitrage bot image.",
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
 		////////////////////// create tar file for docker image build ///////////////////////////////////////////////
-		buildContext, err := createTarFile(botConfig.ArbitrageSrcPath + "/")
+		buildContext, err := createTarFile(botConfig.ArbitrageSrcPath)
 		defer buildContext.Close()
 		if err != nil {
 			return
