@@ -113,6 +113,7 @@ var StartCmd = &cobra.Command{
 			panic(err)
 		}
 		csv_folder := filepath.Dir(ex) + "/csv"
+		_ = os.Mkdir(csv_folder, 0777)
 
 		// create the container
 		createContResp, err := dockerClient.ContainerCreate(ctx, &container.Config{

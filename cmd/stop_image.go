@@ -44,7 +44,7 @@ func chooseContainer() (container types.Container, err error) {
 	// now we let the user choose container
 	imageNames := make([]string, len(containers))
 	for i, _ := range containers {
-		imageNames[i] = containers[i].Image
+		imageNames[i] = containers[i].Status + " : " + containers[i].Image
 	}
 	prompt := promptui.Select{
 		Label: "Select Container",
