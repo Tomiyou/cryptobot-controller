@@ -12,7 +12,9 @@ var BuildCmd = &cobra.Command{
 	Short: "Build a crypto-arbitrage bot image.",
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
 		////////////////////// create tar file for docker image build ///////////////////////////////////////////////
-		buildContext, err := createTarFile(botConfig.ArbitrageSrcPath)
+		buildContext, err := createTarFile(
+			botConfig.ArbitrageSrcPath,
+			"dockerfiles/arbitrage/docker-build.Dockerfile")
 		defer buildContext.Close()
 		if err != nil {
 			return
@@ -25,7 +27,7 @@ var BuildCmd = &cobra.Command{
 			ForceRemove:    true,
 			PullParent:     true,
 			Tags:           []string{botConfig.RemoteImageName},
-			Dockerfile:     "docker/docker-build.Dockerfile",
+			Dockerfile:     "docker-build.Dockerfile",
 		}
 
 		// build the image
