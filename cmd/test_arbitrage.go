@@ -15,12 +15,15 @@ var TestCmd = &cobra.Command{
 		// 1. build crypto-arbitrage
 		build := exec.Command("go", "build")
 		build.Dir = botConfig.ArbitrageSrcPath
-		output, err := build.Output()
+		err = build.Run()
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		fmt.Println(string(output))
+		fmt.Println("Built arbitrage bot.")
+
+		// create csv folder if it doesn't exist
+		_ = os.Mkdir("csv", 0777)
 
 		// 2. run it with args
 		test := exec.Command(

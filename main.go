@@ -27,6 +27,7 @@ func init() {
 		cmd.DecryptCmd,
 		cmd.CleanCmd,
 		cmd.LogCmd,
+		cmd.TestCmd,
 	)
 }
 
