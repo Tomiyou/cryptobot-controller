@@ -94,6 +94,7 @@ func extractTarFile(destination string) (err error) {
 }
 
 func getDockerHubCredentials() (result string, err error) {
+	fmt.Println("Loading Credentials!")
 	authConfig := types.AuthConfig{}
 	if err = jsonLoader.LoadJSON("keys/docker-auth.key", &authConfig); err != nil {
 		return
