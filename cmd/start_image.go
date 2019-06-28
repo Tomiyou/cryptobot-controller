@@ -50,8 +50,9 @@ var StartCmd = &cobra.Command{
 
 		////////////////////// config was chosen, now build the image with config ///////////////////////////////////
 		// remove the .yaml suffix for image name
-		imageName := "cryptobot_" + strings.ToLower(config[:len(config)-5])
+		configName := strings.ToLower(config[:strings.LastIndex(config, ".")])
 		configPath := "config/" + config
+		imageName := "cryptobot_" + configName
 		ctx := context.Background()
 
 		// create tar file for docker image build
@@ -69,7 +70,10 @@ var StartCmd = &cobra.Command{
 			// PullParent:     true,
 			Tags:       []string{imageName},
 			Dockerfile: "docker-run.Dockerfile",
-			BuildArgs:  map[string]*string{"configPath": &configPath},
+			BuildArgs: map[string]*string{
+				"configPath":    &configPath,
+				"orgConfigName": &configName,
+			},
 		}
 
 		// build the image
