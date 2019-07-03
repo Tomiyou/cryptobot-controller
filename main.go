@@ -5,6 +5,7 @@ import (
 
 	"github.com/Tomiyou/cryptobot-controller/cmd"
 
+	"github.com/Tomiyou/jsonLoader"
 	"github.com/spf13/cobra"
 )
 
@@ -14,8 +15,22 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	// let the commands init first
-	cmd.Initialize()
+	// load config
+	err := jsonLoader.LoadJSON("settings.json", &Config)
+	if err != nil {
+		panic(err)
+	}
+
+	// add / to arbitrage src folder
+	if Config.ArbitrageSrcPath[len(Config.ArbitrageSrcPath)-1] != '/' {
+		Config.ArbitrageSrcPath += "/"
+	}
+
+	// init docker api
+	DockerClient, err = docker.NewEnvClient()
+	if err != nil {
+		return
+	}
 
 	// init cobra commands
 	rootCmd.AddCommand(
@@ -23,8 +38,6 @@ func init() {
 		cmd.StartCmd,
 		cmd.StopCmd,
 		cmd.UpdateCmd,
-		cmd.EncryptCmd,
-		cmd.DecryptCmd,
 		cmd.CleanCmd,
 		cmd.LogCmd,
 		cmd.TestCmd,

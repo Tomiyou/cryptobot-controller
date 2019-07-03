@@ -65,11 +65,11 @@ var StartCmd = &cobra.Command{
 		// image options
 		buildOptions := types.ImageBuildOptions{
 			SuppressOutput: false,
-			// Remove:         true,
-			// ForceRemove:    true,
-			// PullParent:     true,
-			Tags:       []string{imageName},
-			Dockerfile: "docker-run.Dockerfile",
+			Remove:         true,
+			ForceRemove:    true,
+			PullParent:     true,
+			Tags:           []string{imageName},
+			Dockerfile:     "docker-run.Dockerfile",
 			BuildArgs: map[string]*string{
 				"configPath":    &configPath,
 				"orgConfigName": &configName,
@@ -77,7 +77,7 @@ var StartCmd = &cobra.Command{
 		}
 
 		// build the image
-		buildResponse, err := dockerClient.ImageBuild(ctx, buildContext, buildOptions)
+		buildResponse, err := DockerClient.ImageBuild(ctx, buildContext, buildOptions)
 		if err != nil {
 			return
 		}
@@ -92,7 +92,7 @@ var StartCmd = &cobra.Command{
 		options.Add("label", "config_name="+config)
 
 		// first we get the running containers
-		containers, err := dockerClient.ContainerList(ctx, types.ContainerListOptions{
+		containers, err := DockerClient.ContainerList(ctx, types.ContainerListOptions{
 			All:     true,
 			Filters: options,
 		})
@@ -120,7 +120,7 @@ var StartCmd = &cobra.Command{
 		_ = os.Mkdir(csv_folder, 0777)
 
 		// create the container
-		createContResp, err := dockerClient.ContainerCreate(ctx, &container.Config{
+		createContResp, err := DockerClient.ContainerCreate(ctx, &container.Config{
 			Image: imageName,
 			// Tty:    true,
 			Labels: map[string]string{
@@ -145,7 +145,7 @@ var StartCmd = &cobra.Command{
 		fmt.Println("Created container with ID:", createContResp.ID)
 
 		// run the created container
-		if err = dockerClient.ContainerStart(ctx, createContResp.ID, types.ContainerStartOptions{}); err != nil {
+		if err = DockerClient.ContainerStart(ctx, createContResp.ID, types.ContainerStartOptions{}); err != nil {
 			return
 		}
 

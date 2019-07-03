@@ -33,7 +33,7 @@ var StopCmd = &cobra.Command{
 
 func chooseContainer() (container types.Container, err error) {
 	ctx := context.Background()
-	containers, err := dockerClient.ContainerList(ctx, types.ContainerListOptions{
+	containers, err := DockerClient.ContainerList(ctx, types.ContainerListOptions{
 		All: true,
 	})
 
