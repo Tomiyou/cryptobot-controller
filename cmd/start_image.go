@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -12,7 +11,6 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/mount"
-	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 )
 
@@ -21,32 +19,7 @@ var StartCmd = &cobra.Command{
 	Short: "Start crypto-arbitrage bot.",
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
 		////////////////////// make the user choose the config that is used as base /////////////////////////////////
-		// first we read the folder contents
-		files, err := ioutil.ReadDir("config")
-		if err != nil {
-			return
-		}
-
-		// then we eliminate all non configs
-		count := 0
-		configs := make([]string, len(files))
-		for _, f := range files {
-			if strings.HasSuffix(f.Name(), ".yaml") {
-				configs[count] = f.Name()
-				count += 1
-			}
-		}
-		configs = configs[:count]
-
-		// now we let the user choose config
-		prompt := promptui.Select{
-			Label: "Select Config",
-			Items: configs,
-		}
-		_, config, err := prompt.Run()
-		if err != nil {
-			return
-		}
+		config, err := chooseConfigFile()
 
 		////////////////////// config was chosen, now build the image with config ///////////////////////////////////
 		// remove the .yaml suffix for image name
@@ -77,12 +50,12 @@ var StartCmd = &cobra.Command{
 		}
 
 		// build the image
-		buildResponse, err := DockerClient.ImageBuild(ctx, buildContext, buildOptions)
+		buildResponse, err := dockerClient.docker.ImageBuild(ctx, buildContext, buildOptions)
 		if err != nil {
 			return
 		}
 
-		err = outputStream(buildResponse.Body)
+		err = displayDockerStream(buildResponse.Body)
 		if err != nil {
 			return
 		}
@@ -92,7 +65,7 @@ var StartCmd = &cobra.Command{
 		options.Add("label", "config_name="+config)
 
 		// first we get the running containers
-		containers, err := DockerClient.ContainerList(ctx, types.ContainerListOptions{
+		containers, err := dockerClient.docker.ContainerList(ctx, types.ContainerListOptions{
 			All:     true,
 			Filters: options,
 		})
@@ -116,11 +89,11 @@ var StartCmd = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
-		csv_folder := filepath.Dir(ex) + "/csv"
-		_ = os.Mkdir(csv_folder, 0777)
+		csvFolder := filepath.Dir(ex) + "/csv"
+		_ = os.Mkdir(csvFolder, 0777)
 
 		// create the container
-		createContResp, err := DockerClient.ContainerCreate(ctx, &container.Config{
+		createContResp, err := dockerClient.docker.ContainerCreate(ctx, &container.Config{
 			Image: imageName,
 			// Tty:    true,
 			Labels: map[string]string{
@@ -133,7 +106,7 @@ var StartCmd = &cobra.Command{
 			Mounts: []mount.Mount{
 				{
 					Type:   mount.TypeBind,
-					Source: csv_folder,
+					Source: csvFolder,
 					Target: "/mounted",
 				},
 			},
@@ -145,7 +118,7 @@ var StartCmd = &cobra.Command{
 		fmt.Println("Created container with ID:", createContResp.ID)
 
 		// run the created container
-		if err = DockerClient.ContainerStart(ctx, createContResp.ID, types.ContainerStartOptions{}); err != nil {
+		if err = dockerClient.docker.ContainerStart(ctx, createContResp.ID, types.ContainerStartOptions{}); err != nil {
 			return
 		}
 

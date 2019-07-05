@@ -1,4 +1,4 @@
-package api
+package cmd
 
 import (
 	"context"
@@ -8,9 +8,9 @@ import (
 	"github.com/docker/docker/api/types/filters"
 )
 
-func (this dockerClient) buildReleaseImage() (err error) {
-	buildContext, err := this.createTarFile(
-		this.Config.ArbitrageSrcPath,
+func buildReleaseImage() (err error) {
+	buildContext, err := createTarFile(
+		botConfig.ArbitrageSrcPath,
 		"dockerfiles/arbitrage/docker-build.Dockerfile")
 	defer buildContext.Close()
 	if err != nil {
@@ -23,34 +23,34 @@ func (this dockerClient) buildReleaseImage() (err error) {
 		Remove:         true,
 		ForceRemove:    true,
 		PullParent:     true,
-		Tags:           []string{this.Config.RemoteImageName},
+		Tags:           []string{botConfig.RemoteImageName},
 		Dockerfile:     "docker-build.Dockerfile",
 	}
 
 	// build the image
 	ctx := context.Background()
-	buildResponse, err := this.API.ImageBuild(ctx, buildContext, buildOptions)
+	buildResponse, err := dockerClient.docker.ImageBuild(ctx, buildContext, buildOptions)
 	if err != nil {
 		return
 	}
 
 	// print the response
-	return this.displayDockerStream(buildResponse.Body)
+	return displayDockerStream(buildResponse.Body)
 }
 
-func (this dockerClient) pushToDockerHub() (err error) {
+func pushToDockerHub() (err error) {
 	// get the credentials from the keyfile
-	err = this.getDockerHubCredentials()
+	err = getDockerHubCredentials()
 	if err != nil {
 		return
 	}
 
 	// push the image to docker hub
-	pushResponse, err := this.API.ImagePush(
+	pushResponse, err := dockerClient.docker.ImagePush(
 		context.Background(),
-		"docker.io/"+this.Config.RemoteImageName,
+		"docker.io/"+botConfig.RemoteImageName,
 		types.ImagePushOptions{
-			RegistryAuth: this.Auth64,
+			RegistryAuth: dockerClient.Auth64,
 		},
 	)
 	if err != nil {
@@ -58,15 +58,15 @@ func (this dockerClient) pushToDockerHub() (err error) {
 	}
 
 	// print the response
-	return this.displayDockerStream(pushResponse)
+	return displayDockerStream(pushResponse)
 }
 
-func (this dockerClient) removeDanglingImages() (err error) {
+func removeDanglingImages() (err error) {
 	filters := filters.NewArgs()
 	filters.Add("dangling", "true")
 
 	// first get dangling images
-	images, err := this.API.ImageList(context.Background(), types.ImageListOptions{Filters: filters})
+	images, err := dockerClient.docker.ImageList(context.Background(), types.ImageListOptions{Filters: filters})
 	if err != nil {
 		return
 	}
@@ -74,7 +74,7 @@ func (this dockerClient) removeDanglingImages() (err error) {
 	// now remove the images and their children
 	fmt.Println("Removing dangling images:")
 	for _, image := range images {
-		removedImages, err := this.API.ImageRemove(context.Background(), image.ID[7:], types.ImageRemoveOptions{
+		removedImages, err := dockerClient.docker.ImageRemove(context.Background(), image.ID[7:], types.ImageRemoveOptions{
 			PruneChildren: true,
 		})
 		if err != nil {

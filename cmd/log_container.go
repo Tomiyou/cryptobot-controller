@@ -14,7 +14,7 @@ var LogCmd = &cobra.Command{
 	Use:   "logs",
 	Short: "Display logs of a crypto-arbitrage bot.",
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
-		// make the user choose the config that is used as base
+		// make the user chose the config that is used as base
 		container, err := chooseContainer()
 		if err != nil {
 			return
@@ -22,7 +22,7 @@ var LogCmd = &cobra.Command{
 
 		// the container was chosen, show the logs
 		ctx := context.Background()
-		stream, err := DockerClient.ContainerLogs(ctx, container.ID, types.ContainerLogsOptions{
+		stream, err := dockerClient.docker.ContainerLogs(ctx, container.ID, types.ContainerLogsOptions{
 			// Follow:     true,
 			ShowStdout: true,
 			ShowStderr: true,
