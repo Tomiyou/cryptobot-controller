@@ -32,7 +32,7 @@ var TestCmd = &cobra.Command{
 			"--log-path", "csv",
 			"--no-log",
 		)
-		test.Env = append(test.Env, "CONFIG_NAME=default_config")
+		test.Env = append(test.Env, "CONTAINER_NAME=test_container")
 		test.Stdout = os.Stdout
 		test.Stderr = os.Stderr
 		if err = test.Run(); err != nil {

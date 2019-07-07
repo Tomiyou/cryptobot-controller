@@ -31,6 +31,16 @@ var StopCmd = &cobra.Command{
 
 		fmt.Println("Stopped and removed container with name:", container.Names[0], "and ID:", container.ID)
 
+		// Remove the image belonging to the container too
+		_, err = client.api.ImageRemove(context.Background(), container.ImageID, types.ImageRemoveOptions{
+			PruneChildren: true,
+		})
+		if err != nil {
+			return
+		}
+
+		fmt.Println("Removed image with ID:", container.ImageID)
+
 		return
 	},
 }

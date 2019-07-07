@@ -74,6 +74,9 @@ func chooseConfigFile() (config string, err error) {
 		Items: configs,
 	}
 	_, config, err = prompt.Run()
+	if err != nil {
+		return
+	}
 
 	return
 }

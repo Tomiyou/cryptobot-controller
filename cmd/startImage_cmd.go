@@ -20,6 +20,10 @@ var StartCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
 		// first handle all the needed user input
 		config, err := chooseConfigFile()
+		if err != nil {
+			return
+		}
+
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Print("Enter container name: ")
 		containerName, _ := reader.ReadString('\n')
@@ -48,7 +52,7 @@ var StartCmd = &cobra.Command{
 			Dockerfile:     "docker-run.Dockerfile",
 			BuildArgs: map[string]*string{
 				"configPath":    &configPath,
-				"orgConfigName": &configName,
+				"containerName": &containerName,
 			},
 		}
 
@@ -74,10 +78,6 @@ var StartCmd = &cobra.Command{
 		// create the container
 		createContResp, err := client.api.ContainerCreate(ctx, &container.Config{
 			Image: imageName,
-			// Tty:    true,
-			Labels: map[string]string{
-				"config_name": config,
-			},
 		}, &container.HostConfig{
 			RestartPolicy: container.RestartPolicy{
 				Name: "on-failure",

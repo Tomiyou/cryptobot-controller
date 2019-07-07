@@ -1,8 +1,8 @@
 FROM tomiyou/crypto-arbitrage:latest
 ARG configPath
 
-ARG orgConfigName
-ENV CONFIG_NAME=$orgConfigName
+ARG containerName
+ENV CONTAINER_NAME=$containerName
 
 WORKDIR /home/appuser/
 
