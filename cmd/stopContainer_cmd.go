@@ -1,0 +1,36 @@
+package cmd
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/docker/docker/api/types"
+	"github.com/spf13/cobra"
+)
+
+var StopCmd = &cobra.Command{
+	Use:   "stop",
+	Short: "Stop crypto-arbitrage bot.",
+	RunE: func(cmd *cobra.Command, args []string) (err error) {
+		// make the user choose the config that is used as base
+		container, err := chooseContainer()
+		if err != nil {
+			return
+		}
+
+		// the container was chosen, time to stop it
+		ctx := context.Background()
+		if err = client.api.ContainerStop(ctx, container.ID, nil); err != nil {
+			return
+		}
+
+		// remove the container
+		if err = client.api.ContainerRemove(ctx, container.ID, types.ContainerRemoveOptions{}); err != nil {
+			return
+		}
+
+		fmt.Println("Stopped and removed container with name:", container.Names[0], "and ID:", container.ID)
+
+		return
+	},
+}
