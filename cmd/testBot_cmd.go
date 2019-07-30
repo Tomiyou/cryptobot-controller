@@ -27,7 +27,7 @@ var TestCmd = &cobra.Command{
 
 		// 2. run it with args
 		test := exec.Command(
-			config.ArbitrageSrcPath+"crypto-arbitrage",
+			config.ArbitrageSrcPath+"cryptobot",
 			"--config-path", "config/default_config.yaml",
 			"--log-path", "csv",
 			"--no-log",

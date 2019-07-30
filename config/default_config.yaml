@@ -1,15 +1,17 @@
+bot: "arbitrage"
+csvHeader: "Bid livecoin,Ask livecoin,Bid binance,Ask binance,Trade,Profit"
 exchangeA:
   exchange: "livecoin"
   keyFile: "keys/livecoin.key"
-  tickerA: "btc" # currency
-  tickerB: "eth" # asset
+  currency: "btc" # currency
+  asset: "eth" # asset
   fee: "0.0018"
   minOrder: "0.00666"
 exchangeB:
   exchange: "binance"
   keyFile: "keys/binance.key"
-  tickerA: "BTC" # currency
-  tickerB: "eth" # asset
+  currency: "BTC" # currency
+  asset: "eth" # asset
   fee: "0.001"
   minOrder: "0.00666"
 mock: true # če je true, pomeni da bot bot ne izvede dejanskih tradov
