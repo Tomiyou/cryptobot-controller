@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"github.com/manifoldco/promptui"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -17,30 +19,38 @@ import (
 var StartCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Start crypto-arbitrage bot.",
-	RunE: func(cmd *cobra.Command, args []string) (err error) {
+	RunE: func(cmd *cobra.Command, args []string) error {
+		// first the user needs to choose which bot to start
+		prompt := promptui.Select{
+			Label: "Choose cryptobot to start",
+			Items: []string{"arbitrage", "triage"},
+		}
+		_, bot, err := prompt.Run()
+		if err != nil {
+			return err
+		}
+
 		// first handle all the needed user input
 		config, err := chooseConfigFile()
 		if err != nil {
-			return
+			return err
 		}
 
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Print("Enter container name: ")
 		containerName, _ := reader.ReadString('\n')
-		containerName = containerName[:len(containerName)-1]
-		fmt.Println("ime:", containerName)
+		containerName = strings.TrimSuffix(containerName, "\n")
 
 		// remove the .yaml suffix for image name
-		configName := strings.ToLower(config[:strings.LastIndex(config, ".")])
 		configPath := "config/" + config
-		imageName := "cryptobot_" + configName
+		imageName := "cryptobot_" + strings.ToLower(strings.TrimSuffix(config, filepath.Ext(config)))
 		ctx := context.Background()
 
 		// create tar file for docker image build
-		buildContext, err := createTarFile("dockerfiles/arbitrage/docker-run.Dockerfile", "keys", "config")
+		buildContext, err := createTarFile(fmt.Sprintf("dockerfiles/%s/run.Dockerfile", bot), "keys", "config")
 		defer buildContext.Close()
 		if err != nil {
-			return
+			return err
 		}
 
 		// image options
@@ -49,7 +59,7 @@ var StartCmd = &cobra.Command{
 			Remove:         true,
 			ForceRemove:    true,
 			Tags:           []string{imageName},
-			Dockerfile:     "docker-run.Dockerfile",
+			Dockerfile:     "run.Dockerfile",
 			BuildArgs: map[string]*string{
 				"configPath":    &configPath,
 				"containerName": &containerName,
@@ -59,24 +69,28 @@ var StartCmd = &cobra.Command{
 		// build the image
 		buildResponse, err := client.api.ImageBuild(ctx, buildContext, buildOptions)
 		if err != nil {
-			return
+			return err
 		}
 
 		err = displayDockerStream(buildResponse.Body)
 		if err != nil {
-			return
+			return err
 		}
 
-		// get the cwd used for mounting csv folder
-		ex, err := os.Executable()
+		// get the pathToSelf used for mounting csv folder
+		csvFolder, err := filepath.Abs("csv")
 		if err != nil {
-			panic(err)
+			return err
 		}
-		csvFolder := filepath.Dir(ex) + "/csv"
-		_ = os.Mkdir(csvFolder, 0777)
+
+		err = os.Mkdir(csvFolder, 0777)
+		log.Println(err)
+		if !os.IsExist(err) {
+			return err
+		}
 
 		// create the container
-		createContResp, err := client.api.ContainerCreate(ctx, &container.Config{
+		createContainerResp, err := client.api.ContainerCreate(ctx, &container.Config{
 			Image: imageName,
 		}, &container.HostConfig{
 			RestartPolicy: container.RestartPolicy{
@@ -91,14 +105,14 @@ var StartCmd = &cobra.Command{
 			},
 		}, nil, containerName)
 		if err != nil {
-			return
+			return err
 		}
 
-		fmt.Println("Created container with name:", containerName, "and ID:", createContResp.ID)
+		fmt.Println("Created container with name:", containerName, "and ID:", createContainerResp.ID)
 
 		// run the created container
-		if err = client.api.ContainerStart(ctx, createContResp.ID, types.ContainerStartOptions{}); err != nil {
-			return
+		if err := client.api.ContainerStart(ctx, createContainerResp.ID, types.ContainerStartOptions{}); err != nil {
+			return err
 		}
 
 		return removeDanglingImages()

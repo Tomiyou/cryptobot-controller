@@ -13,11 +13,11 @@ import (
 var LogCmd = &cobra.Command{
 	Use:   "logs",
 	Short: "Display logs of a crypto-arbitrage bot.",
-	RunE: func(cmd *cobra.Command, args []string) (err error) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		// make the user chose the config that is used as base
 		container, err := chooseContainer()
 		if err != nil {
-			return
+			return err
 		}
 
 		// the container was chosen, show the logs
@@ -28,7 +28,7 @@ var LogCmd = &cobra.Command{
 			ShowStderr: true,
 		})
 		if err != nil {
-			return
+			return err
 		}
 		defer stream.Close()
 

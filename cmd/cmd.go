@@ -15,7 +15,7 @@ var config struct {
 	RemoteImageName      string `json:"remoteImageName"`
 	TemporaryTarPath     string `json:"temporaryTarPath"`
 	EncryptedSecretsPath string `json:"encryptedSecretsPath"`
-	ArbitrageSrcPath     string `json:"ArbitrageSrcPath"`
+	CryptobotSource      string `json:"cryptobotSource"`
 }
 
 func Init() error {
@@ -25,17 +25,11 @@ func Init() error {
 		return err
 	}
 
-	// add / to arbitrage src folder
-	if config.ArbitrageSrcPath[len(config.ArbitrageSrcPath)-1] != '/' {
-		config.ArbitrageSrcPath += "/"
-	}
-
 	// init docker api
-	dockerClient, err := dockerClient.NewEnvClient()
+	client.api, err = dockerClient.NewEnvClient()
 	if err != nil {
 		return err
 	}
 
-	client.api = dockerClient
 	return nil
 }

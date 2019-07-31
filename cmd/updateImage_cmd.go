@@ -10,11 +10,10 @@ import (
 var UpdateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "Update crypto-arbitrage bot.",
-	RunE: func(cmd *cobra.Command, args []string) (err error) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		// get the credentials from the keyfile
-		err = getDockerHubCredentials()
-		if err != nil {
-			return
+		if err := getDockerHubCredentials(); err != nil {
+			return err
 		}
 
 		// pull the image from the docker hub
@@ -26,14 +25,14 @@ var UpdateCmd = &cobra.Command{
 			},
 		)
 		if err != nil {
-			return
+			return err
 		}
 
-		err = displayDockerStream(reader)
-		if err != nil {
-			return
+
+		if err := displayDockerStream(reader); err != nil {
+			return err
 		}
 
-		return
+		return nil
 	},
 }

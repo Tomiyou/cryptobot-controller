@@ -14,7 +14,7 @@ var TestCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
 		// 1. build crypto-arbitrage
 		build := exec.Command("go", "build")
-		build.Dir = config.ArbitrageSrcPath
+		build.Dir = config.CryptobotSource
 		err = build.Run()
 		if err != nil {
 			fmt.Println(err)
@@ -27,7 +27,7 @@ var TestCmd = &cobra.Command{
 
 		// 2. run it with args
 		test := exec.Command(
-			config.ArbitrageSrcPath+"cryptobot",
+			config.CryptobotSource+"cryptobot",
 			"--config-path", "config/default_config.yaml",
 			"--log-path", "csv",
 			"--no-log",

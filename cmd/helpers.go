@@ -21,7 +21,7 @@ import (
 )
 
 // Let the user choose containers from a list
-func chooseContainer() (container types.Container, err error) {
+func chooseContainer() (types.Container, error) {
 	ctx := context.Background()
 	containers, err := client.api.ContainerList(ctx, types.ContainerListOptions{
 		All: true,
@@ -42,43 +42,39 @@ func chooseContainer() (container types.Container, err error) {
 	}
 	index, _, err := prompt.Run()
 	if err != nil {
-		return
+		return types.Container{}, err
 	}
 
-	container = containers[index]
-	return
+	return containers[index], nil
 }
 
 // Let the user choose config file
-func chooseConfigFile() (config string, err error) {
+func chooseConfigFile() (string, error) {
 	// first we read the folder contents
 	files, err := ioutil.ReadDir("config")
 	if err != nil {
-		return
+		return "", err
 	}
 
 	// then we eliminate all non configs
-	count := 0
-	configs := make([]string, len(files))
+	configs := make([]string, len(files))[:0]
 	for _, f := range files {
 		if strings.HasSuffix(f.Name(), ".yaml") {
-			configs[count] = f.Name()
-			count += 1
+			configs = append(configs, f.Name())
 		}
 	}
-	configs = configs[:count]
 
 	// now we let the user choose config
 	prompt := promptui.Select{
 		Label: "Select Config",
 		Items: configs,
 	}
-	_, config, err = prompt.Run()
+	_, config, err := prompt.Run()
 	if err != nil {
-		return
+		return "", err
 	}
 
-	return
+	return config, nil
 }
 
 // IMPORTANT: .close() method needs to be called manually; also '/' at the end of the name is for folders
@@ -98,42 +94,40 @@ func createTarFile(inputs ...string) (file *os.File, err error) {
 }
 
 // read docker credentials from file
-func getDockerHubCredentials() (err error) {
+func getDockerHubCredentials() error {
 	if client.Auth64 != "" {
-		return
+		return nil
 	}
 
 	authConfig := types.AuthConfig{}
-	if err = jsonLoader.LoadJSON("keys/docker-auth.key", &authConfig); err != nil {
-		return
+	if err := jsonLoader.LoadJSON("keys/docker-auth.key", &authConfig); err != nil {
+		return err
 	}
 
 	encodedJSON, err := json.Marshal(authConfig)
 	if err != nil {
-		return
+		return err
 	}
 	client.Auth64 = base64.URLEncoding.EncodeToString(encodedJSON)
 
-	return
+	return nil
 }
 
 // Print the stream from a io.ReadCloser interface to stdout
-func displayDockerStream(body io.ReadCloser) (err error) {
+func displayDockerStream(body io.ReadCloser) error {
 	defer body.Close()
 	termFd, isTerm := term.GetFdInfo(os.Stdout)
-	err = jsonmessage.DisplayJSONMessagesStream(body, os.Stdout, termFd, isTerm, nil)
-
-	return
+	return jsonmessage.DisplayJSONMessagesStream(body, os.Stdout, termFd, isTerm, nil)
 }
 
-func removeDanglingImages() (err error) {
+func removeDanglingImages() error {
 	filters := filters.NewArgs()
 	filters.Add("dangling", "true")
 
 	// first get dangling images
 	images, err := client.api.ImageList(context.Background(), types.ImageListOptions{Filters: filters})
 	if err != nil {
-		return
+		return err
 	}
 
 	// now remove the images and their children
@@ -152,5 +146,5 @@ func removeDanglingImages() (err error) {
 		}
 	}
 
-	return
+	return nil
 }

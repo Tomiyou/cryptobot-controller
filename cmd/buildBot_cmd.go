@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"context"
-
 	"github.com/docker/docker/api/types"
 	"github.com/spf13/cobra"
 )
@@ -10,14 +9,12 @@ import (
 var BuildCmd = &cobra.Command{
 	Use:   "build",
 	Short: "Build a crypto-arbitrage bot image.",
-	RunE: func(cmd *cobra.Command, args []string) (err error) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		// create tar file for docker image build
-		buildContext, err := createTarFile(
-			config.ArbitrageSrcPath,
-			"dockerfiles/arbitrage/docker-build.Dockerfile")
+		buildContext, err := createTarFile(config.CryptobotSource, "dockerfiles/build.Dockerfile")
 		defer buildContext.Close()
 		if err != nil {
-			return
+			return err
 		}
 
 		// image options
@@ -27,27 +24,24 @@ var BuildCmd = &cobra.Command{
 			ForceRemove:    true,
 			PullParent:     true,
 			Tags:           []string{config.RemoteImageName},
-			Dockerfile:     "docker-build.Dockerfile",
+			Dockerfile:     "build.Dockerfile",
 		}
 
 		// build the image
 		ctx := context.Background()
 		buildResponse, err := client.api.ImageBuild(ctx, buildContext, buildOptions)
 		if err != nil {
-			return
+			return err
 		}
 
 		// print the response
-		err = displayDockerStream(buildResponse.Body)
-		if err != nil {
-			return
+
+		if err := displayDockerStream(buildResponse.Body); err != nil {
+			return err
 		}
 
-		// now push the created image to docker hub for remote access
-		// get the credentials from the keyfile
-		err = getDockerHubCredentials()
-		if err != nil {
-			return
+		if err := getDockerHubCredentials(); err != nil {
+			return err
 		}
 
 		// push the image to docker hub
@@ -59,13 +53,12 @@ var BuildCmd = &cobra.Command{
 			},
 		)
 		if err != nil {
-			return
+			return err
 		}
 
 		// print the response
-		err = displayDockerStream(pushResponse)
-		if err != nil {
-			return
+		if err := displayDockerStream(pushResponse); err != nil {
+			return err
 		}
 
 		// remove any leftover images
