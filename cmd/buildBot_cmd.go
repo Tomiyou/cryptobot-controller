@@ -40,7 +40,7 @@ var BuildCmd = &cobra.Command{
 			return err
 		}
 
-		if err := getDockerHubCredentials(); err != nil {
+		if err := ensureDockerCredentials(); err != nil {
 			return err
 		}
 

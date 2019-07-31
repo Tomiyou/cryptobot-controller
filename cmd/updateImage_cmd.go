@@ -12,7 +12,7 @@ var UpdateCmd = &cobra.Command{
 	Short: "Update crypto-arbitrage bot.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// get the credentials from the keyfile
-		if err := getDockerHubCredentials(); err != nil {
+		if err := ensureDockerCredentials(); err != nil {
 			return err
 		}
 
@@ -27,7 +27,6 @@ var UpdateCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-
 
 		if err := displayDockerStream(reader); err != nil {
 			return err

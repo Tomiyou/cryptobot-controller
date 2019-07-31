@@ -94,7 +94,7 @@ func createTarFile(inputs ...string) (file *os.File, err error) {
 }
 
 // read docker credentials from file
-func getDockerHubCredentials() error {
+func ensureDockerCredentials() error {
 	if client.Auth64 != "" {
 		return nil
 	}
