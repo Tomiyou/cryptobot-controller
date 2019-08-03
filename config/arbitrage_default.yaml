@@ -1,0 +1,21 @@
+bot: "arbitrage"
+csvHeader: "Bid livecoin,Ask livecoin,Bid binance,Ask binance,Trade,Profit"
+exchangeA:
+  exchange: "livecoin"
+  keyFile: "keys/livecoin.key"
+  currency: "btc" # currency
+  asset: "eth" # asset
+  fee: "0.0018"
+  minOrder: "0.00666"
+exchangeB:
+  exchange: "binance"
+  keyFile: "keys/binance.key"
+  currency: "BTC" # currency
+  asset: "eth" # asset
+  fee: "0.001"
+  minOrder: "0.00666"
+mock: true # če je true, pomeni da bot bot ne izvede dejanskih tradov
+secondsToSleep: 30 # sekunde, ki jih bot prespi, potem ko se zaključi en bot tick
+secondsToSleepAfterTrade: 70 # sekunde, ki jih bot prespi po tick-u, ko naredi trade
+tradeSafety: "0.985" # nastavi na "1", če hočeš to ignorirat
+qtyMaxDecimals: 8 # število decimalk na katero se zaokroži trading quantity
