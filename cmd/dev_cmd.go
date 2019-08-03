@@ -8,16 +8,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var TestCmd = &cobra.Command{
-	Use:   "test",
-	Short: "Test crypto-arbitrage bot.",
+var DevCmd = &cobra.Command{
+	Use:   "dev",
+	Short: "Start cryptobot in developer mode.",
 	RunE: func(cmd *cobra.Command, args []string) (err error) {
+		configFile, err := chooseConfigFile()
+		if err != nil {
+			return
+		}
+
 		// 1. build crypto-arbitrage
 		build := exec.Command("go", "build")
 		build.Dir = config.CryptobotSource
 		err = build.Run()
 		if err != nil {
-			fmt.Println(err)
 			return
 		}
 		fmt.Println("Built arbitrage bot.")
@@ -28,7 +32,7 @@ var TestCmd = &cobra.Command{
 		// 2. run it with args
 		test := exec.Command(
 			config.CryptobotSource+"cryptobot",
-			"--config-path", "config/arbitrage_default.yaml",
+			"--config-path", "config/"+configFile,
 			"--log-path", "csv",
 			"--no-log",
 		)
@@ -36,7 +40,6 @@ var TestCmd = &cobra.Command{
 		test.Stdout = os.Stdout
 		test.Stderr = os.Stderr
 		if err = test.Run(); err != nil {
-			fmt.Println(err)
 			return
 		}
 

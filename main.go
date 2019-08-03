@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/Tomiyou/cryptobot-controller/cmd"
@@ -21,7 +20,7 @@ func main() {
 		cmd.StopCmd,
 		cmd.UpdateCmd,
 		cmd.LogCmd,
-		cmd.TestCmd,
+		cmd.DevCmd,
 	)
 
 	err := cmd.Init()
@@ -31,6 +30,6 @@ func main() {
 
 	err = rootCmd.Execute()
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 }
