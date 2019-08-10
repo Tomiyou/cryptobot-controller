@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"github.com/manifoldco/promptui"
 	"log"
 	"os"
 	"path/filepath"
@@ -20,16 +19,6 @@ var StartCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Start crypto-arbitrage bot.",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// first the user needs to choose which bot to start
-		prompt := promptui.Select{
-			Label: "Choose cryptobot to start",
-			Items: []string{"arbitrage", "triage"},
-		}
-		_, bot, err := prompt.Run()
-		if err != nil {
-			return err
-		}
-
 		// first handle all the needed user input
 		config, err := chooseConfigFile()
 		if err != nil {
@@ -47,7 +36,7 @@ var StartCmd = &cobra.Command{
 		ctx := context.Background()
 
 		// create tar file for docker image build
-		buildContext, err := createTarFile(fmt.Sprintf("dockerfiles/%s/run.Dockerfile", bot), "keys", "config")
+		buildContext, err := createTarFile("dockerfiles/run.Dockerfile", "keys", "config")
 		defer buildContext.Close()
 		if err != nil {
 			return err
