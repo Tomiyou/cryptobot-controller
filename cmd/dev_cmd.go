@@ -18,7 +18,7 @@ var DevCmd = &cobra.Command{
 		}
 
 		// 1. build crypto-arbitrage
-		build := exec.Command("go", "build")
+		build := exec.Command("go", "build", "-mod", "vendor")
 		build.Dir = config.CryptobotSource
 		err = build.Run()
 		if err != nil {
