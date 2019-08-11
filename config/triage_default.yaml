@@ -1,11 +1,11 @@
 bot: "triage"
-csvHeader: "Bid livecoin,Ask livecoin,Bid binance,Ask binance,Trade,Profit"
+csvHeader: "Currency,Currency spent,Currency Received,Profit"
 exchange:
   exchange: "livecoin"
   keyFile: "keys/livecoin.key"
   fee: "0.0018"
   minOrder: "0.00666"
-mock: false # če je true, pomeni da bot bot ne izvede dejanskih tradov
+mock: true # če je true, pomeni da bot bot ne izvede dejanskih tradov
 secondsToSleep: 30 # sekunde, ki jih bot prespi, potem ko se zaključi en bot tick
 secondsToSleepAfterTrade: 30 # sekunde, ki jih bot prespi, potem ko se zaključi en bot tick
 millisecondsBetweenOrders: 150 # milisekunde, ki jih bot počaka med tremi orderji
